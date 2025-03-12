@@ -1,0 +1,6 @@
+@Liberos_HostAddress = http://localhost:5030
+
+GET {{Liberos_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

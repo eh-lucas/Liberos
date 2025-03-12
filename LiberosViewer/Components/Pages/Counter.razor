@@ -1,0 +1,44 @@
+﻿@page "/counter"
+@using Liberos.Services
+@rendermode InteractiveServer
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @_bookTitle</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<div class="mt-3">
+    <input @bind="@text" @bind:event="oninput" @bind:after="Search">
+    <button @onclick="OnClick">Clear</button>
+    <p>@text</p>
+    <p>@searchResult</p>
+</div>
+
+@code {
+    private string _bookTitle = "";
+    string text = "";
+    string searchResult = "";
+
+    private void IncrementCount()
+    {
+        BookService bookService = new();
+        var books = bookService.GetAllBooks();
+        _bookTitle = books.First(b => b.Id == 1).Title;
+    }
+
+    private void OnClick(MouseEventArgs obj)
+    {
+        text = "";
+    }
+
+    async Task Search()
+    {
+        searchResult = "Searching";
+        await Task.Delay(2000);
+        searchResult = $"Found {Random.Shared.Next()} results!";
+    }
+
+}

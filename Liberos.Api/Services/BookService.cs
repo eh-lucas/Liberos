@@ -1,6 +1,6 @@
-﻿using Liberos.Models;
+﻿using Liberos.Api.Models;
 
-namespace Liberos.Services;
+namespace Liberos.Api.Services;
 
 public class BookService
 {

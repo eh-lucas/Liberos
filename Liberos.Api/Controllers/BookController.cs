@@ -1,8 +1,11 @@
-﻿using Liberos.Models;
-using Liberos.Services;
+﻿using Liberos.Api.Models;
+using Liberos.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
+using Npgsql;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
-namespace Liberos.Controllers;
+namespace Liberos.Api.Controllers;
 
 [ApiController]
 [Route("api/books")]
@@ -11,7 +14,7 @@ public class BookController : ControllerBase
     private readonly BookService _bookService = new();
 
     [HttpGet]
-    public ActionResult<IEnumerable<Book>> GetBooks()
+    public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
     {
         return Ok(_bookService.GetAllBooks());
     }

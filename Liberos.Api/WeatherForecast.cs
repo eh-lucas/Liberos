@@ -1,4 +1,4 @@
-namespace Liberos
+namespace Liberos.Api
 {
     public class WeatherForecast
     {

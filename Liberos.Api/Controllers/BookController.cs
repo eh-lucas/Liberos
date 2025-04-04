@@ -1,28 +1,76 @@
-﻿using Liberos.Api.Models;
-using Liberos.Api.Services;
+﻿using Liberos.Api.Interfaces;
+using Liberos.Api.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
-using Npgsql;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Liberos.Api.Controllers;
 
 [ApiController]
-[Route("api/books")]
+[Route("[controller]")]
 public class BookController : ControllerBase
 {
-    private readonly BookService _bookService = new();
+    private readonly IRepository<Book> _repository;
+    private readonly ILogger<BookController> _logger;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+    public BookController(IRepository<Book> repository, ILogger<BookController> logger)
     {
-        return Ok(_bookService.GetAllBooks());
+        _repository = repository;
+        _logger = logger;
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Book> GetBook(int id)
+    [HttpGet]
+    public ActionResult<IEnumerable<Book>> Get()
     {
-        var book = _bookService.GetBookById(id);
-        return book is not null ? Ok(book) : NotFound("Livro não encontrado");
+        var books = _repository.GetAll();
+        if (books is null || !books.Any())
+            return NotFound("Livros não encontrados.");
+
+        return Ok(books);
+    }
+
+    [HttpGet("{id:int}", Name = "ObterLivro")]
+    public ActionResult<Book> Get(int id)
+    {
+        var book = _repository.Get(b => b.Id == id);
+        if (book is null)
+            return NotFound("Livro não encontrado.");
+
+        return Ok(book);
+    }
+
+    [HttpPost("{id:int}")]
+    public ActionResult Post(Book book)
+    {
+        if (book is null)
+        {
+            _logger.LogWarning($"Dados inválidos.");
+            return BadRequest("Livro informado inválido");
+        }
+
+        var createdBook = _repository.Create(book);
+
+        return new CreatedAtRouteResult("ObterLivro", new { id = createdBook.Id }, createdBook);
+    }
+
+    [HttpPut("{id:int}")]
+    public ActionResult Put(int id, Book book)
+    {
+        if (id != book.Id)
+            return BadRequest("Id informado não corresponde ao id do livro.");
+
+        _repository.Update(book);
+
+        return Ok(book);
+    }
+
+    [HttpDelete("{id:int}")]
+    public ActionResult Delete(int id)
+    {
+        var book = _repository.Get(b => b.Id == id);
+        if (book is null)
+            return NotFound("Livro informado não encontrado.");
+
+        var deletedBook = _repository.Delete(book);
+
+        return Ok(deletedBook);
     }
 }

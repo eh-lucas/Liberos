@@ -1,5 +1,6 @@
-﻿using Liberos.Api.Interfaces;
-using Liberos.Api.Models;
+﻿using Liberos.Api.DTOs;
+using Liberos.Api.DTOs.Mappings;
+using Liberos.Api.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Liberos.Api.Controllers;
@@ -18,54 +19,61 @@ public class BookController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Book>> Get()
+    public ActionResult<IEnumerable<BookDto>> Get()
     {
         var books = _unitOfWork.BookRepository.GetAll();
         if (books is null || !books.Any())
             return NotFound("Livros não encontrados.");
 
-        return Ok(books);
+        var booksDto = books.ToBookDtoList();
+
+        return Ok(booksDto);
     }
 
     [HttpGet("{id:int}", Name = "ObterLivro")]
-    public ActionResult<Book> Get(int id)
+    public ActionResult<BookDto> Get(int id)
     {
         var book = _unitOfWork.BookRepository.Get(b => b.Id == id);
         if (book is null)
             return NotFound("Livro não encontrado.");
 
-        return Ok(book);
+        var bookDto = book.ToBookDto();
+
+        return Ok(bookDto);
     }
 
     [HttpPost]
-    public ActionResult Post(Book book)
+    public ActionResult<BookDto> Post(BookDto bookDto)
     {
-        if (book is null)
-        {
-            _logger.LogWarning($"Dados inválidos.");
-            return BadRequest("Livro informado inválido");
-        }
+        var book = bookDto.ToBook();
 
         var createdBook = _unitOfWork.BookRepository.Create(book);
+
+        var newBookDto = createdBook.ToBookDto();
+
         _unitOfWork.Commit();
 
-        return new CreatedAtRouteResult("ObterLivro", new { id = createdBook.Id }, createdBook);
+        return new CreatedAtRouteResult("ObterLivro", new { id = newBookDto.Id }, newBookDto);
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Book book)
+    public ActionResult<BookDto> Put(int id, BookDto bookDto)
     {
-        if (id != book.Id)
+        if (id != bookDto.Id)
             return BadRequest("Id informado não corresponde ao id do livro.");
 
-        _unitOfWork.BookRepository.Update(book);
+        var book = bookDto.ToBook();
+
+        var updatedBook = _unitOfWork.BookRepository.Update(book);
         _unitOfWork.Commit();
 
-        return Ok(book);
+        var updatedBookDto = updatedBook.ToBookDto();
+
+        return Ok(updatedBookDto);
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    public ActionResult<BookDto> Delete(int id)
     {
         var book = _unitOfWork.BookRepository.Get(b => b.Id == id);
         if (book is null)
@@ -74,6 +82,8 @@ public class BookController : ControllerBase
         var deletedBook = _unitOfWork.BookRepository.Delete(book);
         _unitOfWork.Commit();
 
-        return Ok(deletedBook);
+        var deletedBookDto = deletedBook.ToBookDto();
+
+        return Ok(deletedBookDto);
     }
 }

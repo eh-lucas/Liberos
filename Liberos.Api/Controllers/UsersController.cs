@@ -8,17 +8,17 @@ namespace Liberos.Api.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-    private readonly IRepository<User> _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UsersController(IRepository<User> repository)
+    public UsersController(IUnitOfWork unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<User>> Get()
     {
-        var users = _repository.GetAll();
+        var users = _unitOfWork.UserRepository.GetAll();
         if (users is null || !users.Any())
             return NotFound("Usuários não encontrados.");
 
@@ -28,20 +28,21 @@ public class UsersController : ControllerBase
     [HttpGet("{id:int}", Name = "ObterUser")]
     public ActionResult<User> Get(int id)
     {
-        var user = _repository.Get(c => c.Id == id);
+        var user = _unitOfWork.UserRepository.Get(c => c.Id == id);
         if (user is null)
             return NotFound("Usuário não encontrado.");
 
         return Ok(user);
     }
 
-    [HttpPost("{id:int}")]
+    [HttpPost]
     public ActionResult Post(User user)
     {
         if (user is null)
             return BadRequest("Usuário informado inválido");
 
-        var createdUser = _repository.Create(user);
+        var createdUser = _unitOfWork.UserRepository.Create(user);
+        _unitOfWork.Commit();
 
         return new CreatedAtRouteResult("ObterUser", new { id = createdUser.Id }, createdUser);
     }
@@ -52,7 +53,8 @@ public class UsersController : ControllerBase
         if (id != user.Id)
             return BadRequest("Id informado não corresponde ao id do usuário.");
 
-        _repository.Update(user);
+        _unitOfWork.UserRepository.Update(user);
+        _unitOfWork.Commit();
 
         return Ok(user);
     }
@@ -60,11 +62,12 @@ public class UsersController : ControllerBase
     [HttpDelete]
     public ActionResult Delete(int id)
     {
-        var user = _repository.Get(c => c.Id == id);
+        var user = _unitOfWork.UserRepository.Get(c => c.Id == id);
         if (user is null)
             return NotFound("Usuário informado não encontrado.");
 
-        var deletedUser = _repository.Delete(user);
+        var deletedUser = _unitOfWork.UserRepository.Delete(user);
+        _unitOfWork.Commit();
 
         return Ok(deletedUser);
     }

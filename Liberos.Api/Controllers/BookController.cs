@@ -8,19 +8,19 @@ namespace Liberos.Api.Controllers;
 [Route("[controller]")]
 public class BookController : ControllerBase
 {
-    private readonly IRepository<Book> _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<BookController> _logger;
 
-    public BookController(IRepository<Book> repository, ILogger<BookController> logger)
+    public BookController(IUnitOfWork unitOfWork, ILogger<BookController> logger)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<Book>> Get()
     {
-        var books = _repository.GetAll();
+        var books = _unitOfWork.BookRepository.GetAll();
         if (books is null || !books.Any())
             return NotFound("Livros não encontrados.");
 
@@ -30,14 +30,14 @@ public class BookController : ControllerBase
     [HttpGet("{id:int}", Name = "ObterLivro")]
     public ActionResult<Book> Get(int id)
     {
-        var book = _repository.Get(b => b.Id == id);
+        var book = _unitOfWork.BookRepository.Get(b => b.Id == id);
         if (book is null)
             return NotFound("Livro não encontrado.");
 
         return Ok(book);
     }
 
-    [HttpPost("{id:int}")]
+    [HttpPost]
     public ActionResult Post(Book book)
     {
         if (book is null)
@@ -46,7 +46,8 @@ public class BookController : ControllerBase
             return BadRequest("Livro informado inválido");
         }
 
-        var createdBook = _repository.Create(book);
+        var createdBook = _unitOfWork.BookRepository.Create(book);
+        _unitOfWork.Commit();
 
         return new CreatedAtRouteResult("ObterLivro", new { id = createdBook.Id }, createdBook);
     }
@@ -57,7 +58,8 @@ public class BookController : ControllerBase
         if (id != book.Id)
             return BadRequest("Id informado não corresponde ao id do livro.");
 
-        _repository.Update(book);
+        _unitOfWork.BookRepository.Update(book);
+        _unitOfWork.Commit();
 
         return Ok(book);
     }
@@ -65,11 +67,12 @@ public class BookController : ControllerBase
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
-        var book = _repository.Get(b => b.Id == id);
+        var book = _unitOfWork.BookRepository.Get(b => b.Id == id);
         if (book is null)
             return NotFound("Livro informado não encontrado.");
 
-        var deletedBook = _repository.Delete(book);
+        var deletedBook = _unitOfWork.BookRepository.Delete(book);
+        _unitOfWork.Commit();
 
         return Ok(deletedBook);
     }

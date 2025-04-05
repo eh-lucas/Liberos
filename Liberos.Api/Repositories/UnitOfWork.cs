@@ -2,39 +2,37 @@
 using Liberos.Api.Interfaces;
 
 namespace Liberos.Api.Repositories;
+
 public class UnitOfWork : IUnitOfWork
 {
     private IUserRepository? _userRepo;
 
     private IBookRepository? _bookRepo;
 
-    public LiberosDbContext _context;
+    public LiberosDbContext Context;
+
     public UnitOfWork(LiberosDbContext context)
     {
-        _context = context;
+        Context = context;
     }
 
     public IUserRepository UserRepository
     {
-        get
-        {
-            return _userRepo = _userRepo ?? new UserRepository(_context);
-        }
+        get { return _userRepo = _userRepo ?? new UserRepository(Context); }
     }
+
     public IBookRepository BookRepository
     {
-        get
-        {
-            return _bookRepo = _bookRepo ?? new BookRepository(_context);
-        }
+        get { return _bookRepo = _bookRepo ?? new BookRepository(Context); }
     }
+
     public void Commit()
     {
-        _context.SaveChanges();
+        Context.SaveChanges();
     }
 
     public void Dispose()
     {
-        _context.Dispose();
+        Context.Dispose();
     }
 }

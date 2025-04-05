@@ -26,5 +26,8 @@ public class LiberosDbContext : DbContext
 
     public DbSet<Book> Books { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Token> Tokens { get; set; }
+    public DbSet<Content> Contents { get; set; }
+    public DbSet<UserLibrary> UserLibrary { get; set; }
 }
 

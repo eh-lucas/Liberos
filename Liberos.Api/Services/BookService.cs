@@ -1,14 +1,18 @@
-﻿using Liberos.Api.Models;
+﻿using Liberos.Api.Interfaces;
+using Liberos.Api.Models;
 
 namespace Liberos.Api.Services;
 
 public class BookService
 {
-    private static readonly List<Book> Books = new()
+    private readonly IUnitOfWork _unitOfWork;
+
+    public BookService(IUnitOfWork unitOfWork)
     {
-    };
+        _unitOfWork = unitOfWork;
+    }
 
-    public IEnumerable<Book> GetAllBooks() => Books;
+    public IEnumerable<Book> GetAllBooks() => _unitOfWork.BookRepository.GetAll();
 
-    public Book? GetBookById(int id) => Books.FirstOrDefault(b => b.Id == id);
+    public Book? GetBookById(int id) => _unitOfWork.BookRepository.Get(b => b.Id == id);
 }

@@ -1,4 +1,5 @@
 using Liberos.Api.Data;
+using Liberos.Api.DTOs.Mappings;
 using Liberos.Api.Interfaces;
 using Liberos.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,13 @@ builder.Services.AddDbContext<LiberosDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine, LogLevel.Information));
+
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddAutoMapper(typeof(UserDtoMappingProfile));
 
 
 var app = builder.Build();

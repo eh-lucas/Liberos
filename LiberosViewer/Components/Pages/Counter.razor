@@ -1,12 +1,13 @@
 ﻿@page "/counter"
 @using Liberos.Api.Services
 @rendermode InteractiveServer
+@inject ContentService ContentService
 
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @_bookTitle</p>
+<p role="status">Mostra o conteúdo: @_content</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
@@ -18,15 +19,14 @@
 </div>
 
 @code {
-    private string _bookTitle = "";
+    private string _content = "";
     string text = "";
     string searchResult = "";
 
     private void IncrementCount()
     {
-        BookService bookService = new();
-        var books = bookService.GetAllBooks();
-        _bookTitle = books.First(b => b.Id == 1).Title;
+        var content = ContentService.GetContentById(1);
+        _content = content.ContentText;
     }
 
     private void OnClick(MouseEventArgs obj)

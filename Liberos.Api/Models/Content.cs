@@ -25,5 +25,5 @@ public class Content
     [Column("position_index")]
     public int PositionIndex { get; set; }
 
-    public Book Book { get; set; } = null!;
+    //public Book Book { get; set; } = null!;
 }

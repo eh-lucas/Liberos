@@ -3,5 +3,6 @@ public interface IUnitOfWork
 {
     IUserRepository UserRepository { get; }
     IBookRepository BookRepository { get; }
+    IContentRepository ContentRepository { get; }
     void Commit();
 }

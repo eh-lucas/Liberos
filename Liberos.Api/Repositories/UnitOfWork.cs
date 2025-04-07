@@ -9,6 +9,8 @@ public class UnitOfWork : IUnitOfWork
 
     private IBookRepository? _bookRepo;
 
+    private IContentRepository? _contentRepo;
+
     public LiberosDbContext Context;
 
     public UnitOfWork(LiberosDbContext context)
@@ -24,6 +26,11 @@ public class UnitOfWork : IUnitOfWork
     public IBookRepository BookRepository
     {
         get { return _bookRepo = _bookRepo ?? new BookRepository(Context); }
+    }
+
+    public IContentRepository ContentRepository
+    {
+        get { return _contentRepo = _contentRepo ?? new ContentRepository(Context); }
     }
 
     public void Commit()

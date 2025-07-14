@@ -1,7 +1,9 @@
 ﻿using Liberos.Api.DTOs;
 using Liberos.Api.Interfaces;
 using Liberos.Api.Models;
+using Liberos.Api.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Liberos.Api.Controllers;
 
@@ -24,6 +26,26 @@ public class ContentsController : ControllerBase
         var contents = _unitOfWork.ContentRepository.GetAll();
         if (contents is null || !contents.Any())
             return NotFound("Conteúdos não encontrados.");
+
+        return Ok(contents);
+    }
+
+    [HttpGet("pagination")]
+    public ActionResult<IEnumerable<Content>> Get([FromQuery] ContentsParameters contentsParams)
+    {
+        var contents = _unitOfWork.ContentRepository.GetContents(contentsParams);
+
+        var metadata = new
+        {
+            contents.TotalCount,
+            contents.PageSize,
+            contents.CurrentPage,
+            contents.TotalPages,
+            contents.HasNext,
+            contents.HasPrevious
+        };
+
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
 
         return Ok(contents);
     }

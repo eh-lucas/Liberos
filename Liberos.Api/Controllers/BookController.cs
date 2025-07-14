@@ -1,7 +1,9 @@
 ﻿using Liberos.Api.DTOs;
 using Liberos.Api.DTOs.Mappings;
 using Liberos.Api.Interfaces;
+using Liberos.Api.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Liberos.Api.Controllers;
 
@@ -24,6 +26,28 @@ public class BookController : ControllerBase
         var books = _unitOfWork.BookRepository.GetAll();
         if (books is null || !books.Any())
             return NotFound("Livros não encontrados.");
+
+        var booksDto = books.ToBookDtoList();
+
+        return Ok(booksDto);
+    }
+
+    [HttpGet("pagination")]
+    public ActionResult<IEnumerable<BookDto>> Get([FromQuery] BooksParameters booksParams)
+    {
+        var books = _unitOfWork.BookRepository.GetBooks(booksParams);
+
+        var metadata = new
+        {
+            books.TotalCount,
+            books.PageSize,
+            books.CurrentPage,
+            books.TotalPages,
+            books.HasNext,
+            books.HasPrevious
+        };
+
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
 
         var booksDto = books.ToBookDtoList();
 

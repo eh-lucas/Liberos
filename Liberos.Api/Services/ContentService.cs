@@ -12,8 +12,8 @@ namespace Liberos.Api.Services
             _unitOfWork = unitOfWork;
         }
 
-        public IEnumerable<Content> GetAllContents() => _unitOfWork.ContentRepository.GetAll();
+        public async Task<IEnumerable<Content>> GetAllContentsAsync() => await _unitOfWork.ContentRepository.GetAllAsync();
 
-        public Content? GetContentById(int id) => _unitOfWork.ContentRepository.Get(c => c.Id == id);
+        public async Task<Content?> GetContentByIdAsync(int id) => await _unitOfWork.ContentRepository.GetAsync(c => c.Id == id);
     }
 }

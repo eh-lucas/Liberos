@@ -20,9 +20,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<UserDto>> Get()
+    public async Task<ActionResult<IEnumerable<UserDto>>> Get()
     {
-        var users = _unitOfWork.UserRepository.GetAll();
+        var users = await _unitOfWork.UserRepository.GetAllAsync();
         if (users is null || !users.Any())
             return NotFound("Usuários não encontrados.");
 
@@ -32,9 +32,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id:int}", Name = "ObterUser")]
-    public ActionResult<UserDto> Get(int id)
+    public async Task<ActionResult<UserDto>> Get(int id)
     {
-        var user = _unitOfWork.UserRepository.Get(c => c.Id == id);
+        var user = await _unitOfWork.UserRepository.GetAsync(c => c.Id == id);
         if (user is null)
             return NotFound("Usuário não encontrado.");
         
@@ -44,7 +44,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<UserDto> Post(UserDto userDto)
+    public async Task<ActionResult<UserDto>> Post(UserDto userDto)
     {
         if (userDto is null)
             return BadRequest("Usuário informado inválido");
@@ -52,7 +52,7 @@ public class UsersController : ControllerBase
         var user = _mapper.Map<User>(userDto);
 
         var createdUser = _unitOfWork.UserRepository.Create(user);
-        _unitOfWork.Commit();
+        _unitOfWork.CommitAsync();
 
         var createdUserDto = _mapper.Map<UserDto>(createdUser);
 
@@ -60,7 +60,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult<UserDto> Put(int id, UserDto userDto)
+    public async Task<ActionResult<UserDto>> Put(int id, UserDto userDto)
     {
         if (id != userDto.Id)
             return BadRequest("Id informado não corresponde ao id do usuário.");
@@ -68,7 +68,7 @@ public class UsersController : ControllerBase
         var user = _mapper.Map<User>(userDto);
 
         var updatedUser = _unitOfWork.UserRepository.Update(user);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         var updatedUserDto = _mapper.Map<UserDto>(updatedUser);
 
@@ -76,14 +76,14 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete]
-    public ActionResult<UserDto> Delete(int id)
+    public async Task<ActionResult<UserDto>> Delete(int id)
     {
-        var user = _unitOfWork.UserRepository.Get(c => c.Id == id);
+        var user = await _unitOfWork.UserRepository.GetAsync(c => c.Id == id);
         if (user is null)
             return NotFound("Usuário informado não encontrado.");
 
         var deletedUser = _unitOfWork.UserRepository.Delete(user);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         var deletedUserDto = _mapper.Map<UserDto>(deletedUser);
 

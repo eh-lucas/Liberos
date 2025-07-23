@@ -10,12 +10,13 @@ public class BookRepository : Repository<Book>, IBookRepository
     {
     }
 
-    public PagedList<Book> GetBooks(BooksParameters booksParams)
+    public async Task<PagedList<Book>> GetBooksAsync(BooksParameters booksParams)
     {
-        var books = GetAll().OrderBy(p => p.Id).AsQueryable();
-        var orderedBooks = PagedList<Book>.ToPagedList(books, booksParams.PageNumber, booksParams.PageSize);
+        var books = await GetAllAsync();
+        var orderedBooks = books.OrderBy(p => p.Id).AsQueryable();
+        var result = PagedList<Book>.ToPagedList(orderedBooks, booksParams.PageNumber, booksParams.PageSize);
 
-        return orderedBooks;
+        return result;
     }
     //public IEnumerable<Book> GetBooks(BooksParameters booksParams)
     //{

@@ -10,11 +10,12 @@ public class ContentRepository : Repository<Content>, IContentRepository
     {
     }
 
-    public PagedList<Content> GetContents(ContentsParameters contentParams)
+    public async Task<PagedList<Content>> GetContentsAsync(ContentsParameters contentParams)
     {
-        var contents = GetAll().OrderBy(p => p.Id).AsQueryable();
-        var orderedContents = PagedList<Content>.ToPagedList(contents, contentParams.PageNumber, contentParams.PageSize);
+        var contents = await GetAllAsync();
+        var orderedContents = contents.OrderBy(p => p.Id).AsQueryable();
+        var result = PagedList<Content>.ToPagedList(orderedContents, contentParams.PageNumber, contentParams.PageSize);
 
-        return orderedContents;
+        return result;
     }
 }

@@ -33,9 +33,9 @@ public class UnitOfWork : IUnitOfWork
         get { return _contentRepo = _contentRepo ?? new ContentRepository(Context); }
     }
 
-    public void Commit()
+    public async Task CommitAsync()
     {
-        Context.SaveChanges();
+        await Context.SaveChangesAsync();
     }
 
     public void Dispose()

@@ -1,9 +1,10 @@
 ﻿using Liberos.Api.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Liberos.Api.Data;
 
-public class LiberosDbContext : DbContext
+public class LiberosDbContext : IdentityDbContext
 {
     public LiberosDbContext(DbContextOptions<LiberosDbContext> options) : base(options) { }
 

@@ -2,6 +2,7 @@ using Liberos.Api.Data;
 using Liberos.Api.DTOs.Mappings;
 using Liberos.Api.Interfaces;
 using Liberos.Api.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAutoMapper(typeof(UserDtoMappingProfile));
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<LiberosDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 

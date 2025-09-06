@@ -16,6 +16,8 @@ builder.Services.AddDbContext<LiberosDbContext>(options =>
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine, LogLevel.Information));
 
+var secretKey = builder.Configuration["JWT:SecretKey"] ?? throw new ArgumentException("JWT:SecretKey is not configured.");
+
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

@@ -11,6 +11,8 @@ public class UnitOfWork : IUnitOfWork
 
     private IContentRepository? _contentRepo;
 
+    private IUserLibraryRepository? _userLibraryRepo;
+
     public LiberosDbContext Context;
 
     public UnitOfWork(LiberosDbContext context)
@@ -31,6 +33,10 @@ public class UnitOfWork : IUnitOfWork
     public IContentRepository ContentRepository
     {
         get { return _contentRepo = _contentRepo ?? new ContentRepository(Context); }
+    }
+    public IUserLibraryRepository UserLibraryRepository
+    {
+        get { return _userLibraryRepo = _userLibraryRepo ?? new UserLibraryRepository(Context); }
     }
 
     public async Task CommitAsync()

@@ -14,11 +14,20 @@ public class GoogleDocumentAiController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<string>> Get()
     {
-        var tesseract = new TesseractReaderService();
-        var content = tesseract.Quickstart();
+        //// tesseract
+        //var tesseract = new TesseractReaderService();
+        //var content = tesseract.Quickstart();
+
+        //// google vision
         //var gDocAi = new GoogleDocumentAiService();
         //var document = gDocAi.Quickstart();
         //var content = document.Content;
+
+        // google vision
+        var vision = new GoogleVisionAiService();
+        var content = vision.Quickstart();
+
+
         return Ok(content);
     }
 }

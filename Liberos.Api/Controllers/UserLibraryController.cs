@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using Liberos.Api.DTOs;
-using Liberos.Api.DTOs.Mappings;
-using Liberos.Api.Interfaces;
-using Liberos.Api.Models;
-using Liberos.Api.Pagination;
+using Liberos.Application.DTOs;
+using Liberos.Domain.Interfaces;
+using Liberos.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Liberos.Api.Controllers;
 

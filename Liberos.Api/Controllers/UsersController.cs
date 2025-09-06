@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Liberos.Api.DTOs;
-using Liberos.Api.Interfaces;
-using Liberos.Api.Models;
+using Liberos.Application.DTOs;
+using Liberos.Domain.Interfaces;
+using Liberos.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Liberos.Api.Controllers;

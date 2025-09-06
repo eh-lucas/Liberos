@@ -1,9 +1,9 @@
-using Liberos.Api.Interfaces;
-using Liberos.Api.Repositories;
-using Liberos.Api.Services;
 using LiberosViewer.Components;
-using Liberos.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using Liberos.Domain.Interfaces;
+using Liberos.Infrastructure.Data;
+using Liberos.Application.Services;
+using Liberos.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,7 +1,7 @@
-using Liberos.Api.Data;
-using Liberos.Api.DTOs.Mappings;
-using Liberos.Api.Interfaces;
-using Liberos.Api.Repositories;
+using Liberos.Application.DTOs.Mappings;
+using Liberos.Domain.Interfaces;
+using Liberos.Infrastructure.Data;
+using Liberos.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

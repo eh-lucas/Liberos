@@ -1,7 +1,7 @@
-﻿using Liberos.Api.DTOs;
-using Liberos.Api.DTOs.Mappings;
-using Liberos.Api.Interfaces;
-using Liberos.Api.Pagination;
+﻿using Liberos.Application.DTOs;
+using Liberos.Application.DTOs.Mappings;
+using Liberos.Domain.Interfaces;
+using Liberos.Domain.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 

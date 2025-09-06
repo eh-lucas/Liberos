@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Liberos.Api\Liberos.Api.csproj" />
-    <ProjectReference Include="..\Liberos\Liberos.Api.csproj" />
   </ItemGroup>
 
 </Project>

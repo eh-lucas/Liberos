@@ -12,7 +12,7 @@ public class BookService
         _unitOfWork = unitOfWork;
     }
 
-    public IEnumerable<Book> GetAllBooks() => _unitOfWork.BookRepository.GetAll();
+    public async Task<IEnumerable<Book>> GetAllBooksAsync() => await _unitOfWork.BookRepository.GetAllAsync();
 
-    public Book? GetBookById(int id) => _unitOfWork.BookRepository.Get(b => b.Id == id);
+    public async Task<Book?> GetBookByIdAsync(int id) => await _unitOfWork.BookRepository.GetAsync(b => b.Id == id);
 }

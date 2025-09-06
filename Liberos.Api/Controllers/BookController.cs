@@ -1,7 +1,9 @@
 ﻿using Liberos.Api.DTOs;
 using Liberos.Api.DTOs.Mappings;
 using Liberos.Api.Interfaces;
+using Liberos.Api.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Liberos.Api.Controllers;
 
@@ -19,9 +21,9 @@ public class BookController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<BookDto>> Get()
+    public async Task<ActionResult<IEnumerable<BookDto>>> GetAsync()
     {
-        var books = _unitOfWork.BookRepository.GetAll();
+        var books = await _unitOfWork.BookRepository.GetAllAsync();
         if (books is null || !books.Any())
             return NotFound("Livros não encontrados.");
 
@@ -30,10 +32,32 @@ public class BookController : ControllerBase
         return Ok(booksDto);
     }
 
-    [HttpGet("{id:int}", Name = "ObterLivro")]
-    public ActionResult<BookDto> Get(int id)
+    [HttpGet("pagination")]
+    public async Task<ActionResult<IEnumerable<BookDto>>> Get([FromQuery] BooksParameters booksParams)
     {
-        var book = _unitOfWork.BookRepository.Get(b => b.Id == id);
+        var books = await _unitOfWork.BookRepository.GetBooksAsync(booksParams);
+
+        var metadata = new
+        {
+            books.TotalCount,
+            books.PageSize,
+            books.CurrentPage,
+            books.TotalPages,
+            books.HasNext,
+            books.HasPrevious
+        };
+
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+        var booksDto = books.ToBookDtoList();
+
+        return Ok(booksDto);
+    }
+
+    [HttpGet("{id:int}", Name = "ObterLivro")]
+    public async Task<ActionResult<BookDto>> Get(int id)
+    {
+        var book = await _unitOfWork.BookRepository.GetAsync(b => b.Id == id);
         if (book is null)
             return NotFound("Livro não encontrado.");
 
@@ -43,7 +67,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<BookDto> Post(BookDto bookDto)
+    public async Task<ActionResult<BookDto>> Post(BookDto bookDto)
     {
         var book = bookDto.ToBook();
 
@@ -51,13 +75,13 @@ public class BookController : ControllerBase
 
         var newBookDto = createdBook.ToBookDto();
 
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         return new CreatedAtRouteResult("ObterLivro", new { id = newBookDto.Id }, newBookDto);
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult<BookDto> Put(int id, BookDto bookDto)
+    public async Task<ActionResult<BookDto>> Put(int id, BookDto bookDto)
     {
         if (id != bookDto.Id)
             return BadRequest("Id informado não corresponde ao id do livro.");
@@ -65,7 +89,7 @@ public class BookController : ControllerBase
         var book = bookDto.ToBook();
 
         var updatedBook = _unitOfWork.BookRepository.Update(book);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         var updatedBookDto = updatedBook.ToBookDto();
 
@@ -73,14 +97,14 @@ public class BookController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult<BookDto> Delete(int id)
+    public async Task<ActionResult<BookDto>> Delete(int id)
     {
-        var book = _unitOfWork.BookRepository.Get(b => b.Id == id);
+        var book = await _unitOfWork.BookRepository.GetAsync(b => b.Id == id);
         if (book is null)
             return NotFound("Livro informado não encontrado.");
 
         var deletedBook = _unitOfWork.BookRepository.Delete(book);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         var deletedBookDto = deletedBook.ToBookDto();
 

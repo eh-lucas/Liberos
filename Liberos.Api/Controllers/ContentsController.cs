@@ -1,7 +1,9 @@
 ﻿using Liberos.Api.DTOs;
 using Liberos.Api.Interfaces;
 using Liberos.Api.Models;
+using Liberos.Api.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Liberos.Api.Controllers;
 
@@ -19,19 +21,39 @@ public class ContentsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Content>> Get()
+    public async Task<ActionResult<IEnumerable<Content>>> Get()
     {
-        var contents = _unitOfWork.ContentRepository.GetAll();
+        var contents = await _unitOfWork.ContentRepository.GetAllAsync();
         if (contents is null || !contents.Any())
             return NotFound("Conteúdos não encontrados.");
 
         return Ok(contents);
     }
 
-    [HttpGet("{id:int}", Name = "ObterConteudo")]
-    public ActionResult<BookDto> Get(int id)
+    [HttpGet("pagination")]
+    public async Task<ActionResult<IEnumerable<Content>>> Get([FromQuery] ContentsParameters contentsParams)
     {
-        var content = _unitOfWork.ContentRepository.Get(b => b.Id == id);
+        var contents = await _unitOfWork.ContentRepository.GetContentsAsync(contentsParams);
+
+        var metadata = new
+        {
+            contents.TotalCount,
+            contents.PageSize,
+            contents.CurrentPage,
+            contents.TotalPages,
+            contents.HasNext,
+            contents.HasPrevious
+        };
+
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+        return Ok(contents);
+    }
+
+    [HttpGet("{id:int}", Name = "ObterConteudo")]
+    public async Task<ActionResult<BookDto>> Get(int id)
+    {
+        var content = await _unitOfWork.ContentRepository.GetAsync(b => b.Id == id);
         if (content is null)
             return NotFound("Conteúdo não encontrado.");
 
@@ -39,35 +61,35 @@ public class ContentsController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Content> Post(Content content)
+    public async Task<ActionResult<Content>> Post(Content content)
     {
         var createdContent = _unitOfWork.ContentRepository.Create(content);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         return new CreatedAtRouteResult("ObterConteudo", new { id = createdContent.Id }, createdContent);
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult<Content> Put(int id, Content content)
+    public async Task<ActionResult<Content>> Put(int id, Content content)
     {
         if (id != content.Id)
             return BadRequest("Id informado não corresponde ao id do conteúdo.");
 
         var updatedContent = _unitOfWork.ContentRepository.Update(content);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         return Ok(updatedContent);
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult<Content> Delete(int id)
+    public async Task<ActionResult<Content>> Delete(int id)
     {
-        var content = _unitOfWork.ContentRepository.Get(b => b.Id == id);
+        var content = await _unitOfWork.ContentRepository.GetAsync(b => b.Id == id);
         if (content is null)
             return NotFound("Conteúdo informado não encontrado.");
 
         var deletedContent = _unitOfWork.ContentRepository.Delete(content);
-        _unitOfWork.Commit();
+        await _unitOfWork.CommitAsync();
 
         return Ok(deletedContent);
     }

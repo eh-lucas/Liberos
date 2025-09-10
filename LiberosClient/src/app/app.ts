@@ -6,10 +6,11 @@ import { HttpClient, provideHttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule], // apenas o necessário
+  imports: [RouterOutlet, CommonModule], 
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
+
 export class App implements OnInit {
 
   protected readonly title = signal('LiberosClient');
